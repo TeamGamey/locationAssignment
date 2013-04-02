@@ -186,6 +186,7 @@ public class LocationActivity extends FragmentActivity {
         if (mUseFine) {
             mFineProviderButton.setBackgroundResource(R.drawable.button_active);
             mBothProviderButton.setBackgroundResource(R.drawable.button_inactive);
+            mNetProviderButton.setBackgroundResource(R.drawable.button_inactive);
             // Request updates from just the fine (gps) provider.
             gpsLocation = requestUpdatesFromProvider(
                     LocationManager.GPS_PROVIDER, R.string.not_support_gps);
@@ -199,6 +200,7 @@ public class LocationActivity extends FragmentActivity {
             // Get coarse and fine location updates.
             mFineProviderButton.setBackgroundResource(R.drawable.button_inactive);
             mBothProviderButton.setBackgroundResource(R.drawable.button_active);
+            mNetProviderButton.setBackgroundResource(R.drawable.button_inactive);
             // Request updates from both fine (gps) and coarse (network) providers.
             gpsLocation = requestUpdatesFromProvider(
                     LocationManager.GPS_PROVIDER, R.string.not_support_gps);
@@ -229,6 +231,7 @@ public class LocationActivity extends FragmentActivity {
         	networkLocation = requestUpdatesFromProvider(
                     LocationManager.NETWORK_PROVIDER, R.string.not_support_network);
         	if (networkLocation != null) {
+        		updateUILocation(networkLocation);
                 appendLog("networkLocation: " + networkLocation.getLatitude() + ", "
                         + networkLocation.getLongitude() + ", " + networkLocation.getAccuracy());
             }
