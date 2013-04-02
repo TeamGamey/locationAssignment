@@ -52,15 +52,19 @@ public class LocationActivity extends FragmentActivity {
     private TextView mAddress;
     private Button mFineProviderButton;
     private Button mBothProviderButton;
+    private Button mNetProviderButton;
     private LocationManager mLocationManager;
     private Handler mHandler;
     private boolean mGeocoderAvailable;
     private boolean mUseFine;
     private boolean mUseBoth;
+    private boolean mUseNet;
 
     // Keys for maintaining UI states after rotation.
     private static final String KEY_FINE = "use_fine";
     private static final String KEY_BOTH = "use_both";
+//    private static final String KEY_GPS = "use_gps";
+    private static final String KEY_NET = "use_net";
     // UI handler codes.
     private static final int UPDATE_ADDRESS = 1;
     private static final int UPDATE_LATLNG = 2;
@@ -84,9 +88,11 @@ public class LocationActivity extends FragmentActivity {
         if (savedInstanceState != null) {
             mUseFine = savedInstanceState.getBoolean(KEY_FINE);
             mUseBoth = savedInstanceState.getBoolean(KEY_BOTH);
+            mUseNet = savedInstanceState.getBoolean(KEY_NET);
         } else {
             mUseFine = false;
             mUseBoth = false;
+            mUseNet = false;
         }
         mLatLng = (TextView) findViewById(R.id.latlng);
         mAddress = (TextView) findViewById(R.id.address);
@@ -95,6 +101,8 @@ public class LocationActivity extends FragmentActivity {
         // Receive location updates from both the fine (gps) and coarse (network) location
         // providers.
         mBothProviderButton = (Button) findViewById(R.id.provider_both);
+        
+        mNetProviderButton = (Button) findViewById(R.id.provider_net);
 
         // The isPresent() helper method is only available on Gingerbread or above.
         mGeocoderAvailable =
@@ -123,6 +131,8 @@ public class LocationActivity extends FragmentActivity {
         super.onSaveInstanceState(outState);
         outState.putBoolean(KEY_FINE, mUseFine);
         outState.putBoolean(KEY_BOTH, mUseBoth);
+        outState.putBoolean(KEY_NET, mUseNet);
+        
     }
 
     @Override
@@ -212,6 +222,16 @@ public class LocationActivity extends FragmentActivity {
                 appendLog("networkLocation: " + networkLocation.getLatitude() + ", "
                         + networkLocation.getLongitude() + ", " + networkLocation.getAccuracy());
             }
+        } else if (mUseNet){
+        	mFineProviderButton.setBackgroundResource(R.drawable.button_inactive);
+            mBothProviderButton.setBackgroundResource(R.drawable.button_inactive);
+            mNetProviderButton.setBackgroundResource(R.drawable.button_active);
+        	networkLocation = requestUpdatesFromProvider(
+                    LocationManager.NETWORK_PROVIDER, R.string.not_support_network);
+        	if (networkLocation != null) {
+                appendLog("networkLocation: " + networkLocation.getLatitude() + ", "
+                        + networkLocation.getLongitude() + ", " + networkLocation.getAccuracy());
+            }
         }
     }
 
@@ -236,11 +256,19 @@ public class LocationActivity extends FragmentActivity {
         }
         return location;
     }
+    
+    public void useNetworkProvider(View v){
+    	mUseFine = false;
+    	mUseBoth = false;
+    	mUseNet = true;
+    	setup();
+    }
 
     // Callback method for the "fine provider" button.
     public void useFineProvider(View v) {
         mUseFine = true;
         mUseBoth = false;
+        mUseNet = false;
         setup();
     }
 
@@ -248,6 +276,7 @@ public class LocationActivity extends FragmentActivity {
     public void useCoarseFineProviders(View v) {
         mUseFine = false;
         mUseBoth = true;
+        mUseNet = false;
         setup();
     }
 
